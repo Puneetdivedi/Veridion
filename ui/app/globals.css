@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+:root {
+  --background: #050505;
+  --foreground: #ffffff;
+  --accent-primary: #10b981; /* Emerald 500 */
+  --accent-secondary: #0ea5e9; /* Sky 500 */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', sans-serif;
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(14, 165, 233, 0.05) 0%, transparent 40%);
+  min-height: 100vh;
+}
+
+@layer components {
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    transition: opacity 0.2s;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.9;
+  }
+  
+  .truth-score-ring {
+    stroke-dasharray: 283;
+    stroke-dashoffset: calc(283 - (283 * var(--score)) / 100);
+    transition: stroke-dashoffset 1s ease-out;
+  }
+}
+
+.animate-glow {
+  animation: glow 4s infinite alternate;
+}
+
+@keyframes glow {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
+}

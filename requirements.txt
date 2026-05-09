@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+langgraph
+langchain
+langchain-google-genai
+pydantic
+pydantic-settings
+python-dotenv
+chromadb
+pandas
+numpy
+hashlib
+PyPDF2
+python-multipart
+jinja2
+requests
+loguru
