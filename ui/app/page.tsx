@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+
+interface Evidence {
+  source: string;
+  type: string;
+  value: string;
+  confidence: number;
+}
 
 interface AuditRecord {
   audit_id: string;
@@ -8,7 +15,7 @@ interface AuditRecord {
   truth_score: number;
   status: string;
   audit_summary: string;
-  evidence_found: any[];
+  evidence_found: Evidence[];
 }
 
 export default function Home() {
@@ -31,10 +38,18 @@ export default function Home() {
       
       // Poll for results
       const pollInterval = setInterval(async () => {
-        const statusRes = await fetch(`http://localhost:8000/audit/${data.audit_id}`);
-        const statusData = await statusRes.json();
-        if (statusData.status === 'complete') {
-          setAudits(prev => [statusData, ...prev]);
+        try {
+          const statusRes = await fetch(`http://localhost:8000/audit/${data.audit_id}`);
+          if (!statusRes.ok) throw new Error("Failed to fetch audit status");
+          
+          const statusData = await statusRes.json();
+          if (statusData.status === 'complete') {
+            setAudits(prev => [statusData, ...prev]);
+            setLoading(false);
+            clearInterval(pollInterval);
+          }
+        } catch (err) {
+          console.error("Polling error:", err);
           setLoading(false);
           clearInterval(pollInterval);
         }

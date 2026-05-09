@@ -1,11 +1,26 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import uuid
+from loguru import logger
 from agents.graph import esg_graph
 from core.blockchain import ESGBlockchain, AuditBlock
 
+# Configure Logger
+logger.add("logs/audit.log", rotation="10 MB", level="INFO")
+
 app = FastAPI(title="Veridion ESG API", version="1.0.0")
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # In production, specify the actual origin
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 blockchain = ESGBlockchain()
 
 class AuditRequest(BaseModel):
@@ -44,17 +59,23 @@ async def start_audit(request: AuditRequest, background_tasks: BackgroundTasks):
     return AuditResponse(audit_id=audit_id, status="started")
 
 async def run_audit_pipeline(audit_id: str, state: dict):
-    # Execute LangGraph
-    result = esg_graph.invoke(state)
-    audit_results[audit_id] = result
-    
-    # Log to Blockchain
-    blockchain.add_audit_record(
-        audit_id=audit_id,
-        company=result["company_name"],
-        truth_score=result["truth_score"],
-        evidence_summary=result["audit_summary"]
-    )
+    logger.info(f"Starting audit pipeline for {state['company_name']} (ID: {audit_id})")
+    try:
+        # Execute LangGraph
+        result = esg_graph.invoke(state)
+        audit_results[audit_id] = result
+        
+        # Log to Blockchain
+        blockchain.add_audit_record(
+            audit_id=audit_id,
+            company=result["company_name"],
+            truth_score=result["truth_score"],
+            evidence_summary=result["audit_summary"]
+        )
+        logger.success(f"Audit {audit_id} complete. Truth Score: {result['truth_score']}")
+    except Exception as e:
+        logger.error(f"Audit {audit_id} failed: {str(e)}")
+        audit_results[audit_id]["status"] = "failed"
 
 @app.get("/audit/{audit_id}")
 async def get_audit_status(audit_id: str):

@@ -4,11 +4,14 @@ import os
 from typing import Dict, Any
 from .state import AgentState
 
+# Resolve base path
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 class ESGNodes:
     def researcher(self, state: AgentState) -> Dict[str, Any]:
         """Scans satellite data and public records."""
         company = state["company_name"]
-        data_path = f"c:/Users/ADMIN/Desktop/Veridion/data/satellite/{company}_obs.json"
+        data_path = os.path.join(BASE_DIR, "data", "satellite", f"{company}_obs.json")
         
         evidence = {
             "source": "Satellite-Sentinel-5P",
@@ -33,7 +36,7 @@ class ESGNodes:
     def auditor(self, state: AgentState) -> Dict[str, Any]:
         """Processes invoices and energy bills."""
         company = state["company_name"]
-        data_path = f"c:/Users/ADMIN/Desktop/Veridion/data/invoices/{company}_invoices.json"
+        data_path = os.path.join(BASE_DIR, "data", "invoices", f"{company}_invoices.json")
         
         evidence = {
             "source": "Supply Chain Invoices",

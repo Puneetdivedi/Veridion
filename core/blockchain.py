@@ -50,7 +50,7 @@ class ESGBlockchain:
             previous = self.chain[i-1]
             
             # Check hash integrity
-            block_data = current.dict(exclude={"hash"})
+            block_data = current.model_dump(exclude={"hash"})
             if current.hash != self._hash_block(block_data):
                 return False
             
