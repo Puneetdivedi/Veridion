@@ -9,7 +9,6 @@ python-dotenv
 chromadb
 pandas
 numpy
-hashlib
 PyPDF2
 python-multipart
 jinja2

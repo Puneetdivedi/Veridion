@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import uuid
+import os
+import json
 from loguru import logger
 from agents.graph import esg_graph
 from core.blockchain import ESGBlockchain, AuditBlock
@@ -33,8 +35,23 @@ class AuditResponse(BaseModel):
     truth_score: Optional[float] = None
     summary: Optional[str] = None
 
-# In-memory store for audit results (simulating a database)
-audit_results = {}
+# Persistent storage for audit results
+AUDIT_DB_PATH = "data/audit_db.json"
+
+def load_audits():
+    if os.path.exists(AUDIT_DB_PATH):
+        with open(AUDIT_DB_PATH, "r") as f:
+            return json.load(f)
+    return {}
+
+def save_audit(audit_id, data):
+    audits = load_audits()
+    audits[audit_id] = data
+    os.makedirs("data", exist_ok=True)
+    with open(AUDIT_DB_PATH, "w") as f:
+        json.dump(audits, f, indent=4)
+
+audit_results = load_audits()
 
 @app.post("/audit", response_model=AuditResponse)
 async def start_audit(request: AuditRequest, background_tasks: BackgroundTasks):
@@ -52,6 +69,7 @@ async def start_audit(request: AuditRequest, background_tasks: BackgroundTasks):
     }
     
     audit_results[audit_id] = initial_state
+    save_audit(audit_id, initial_state)
     
     # Run graph in background
     background_tasks.add_task(run_audit_pipeline, audit_id, initial_state)
@@ -64,6 +82,7 @@ async def run_audit_pipeline(audit_id: str, state: dict):
         # Execute LangGraph
         result = esg_graph.invoke(state)
         audit_results[audit_id] = result
+        save_audit(audit_id, result)
         
         # Log to Blockchain
         blockchain.add_audit_record(

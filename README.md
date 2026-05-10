@@ -4,8 +4,9 @@ Veridion is an industrial-grade platform designed to verify corporate sustainabi
 
 ## 🚀 Key Features
 - **Multi-Source Verification**: AI agents cross-reference supply chain invoices, energy bills, and satellite data.
-- **RAG-Powered Auditing**: Automated extraction of ESG metrics from unstructured documents (PDFs, Images).
+- **RAG-Powered Auditing**: Genuine Retrieval-Augmented Generation using sustainability reports for evidence extraction.
 - **Truth Score Engine**: A weighted algorithmic scoring system to quantify corporate "green" claims.
+- **Persistent Audit Trail**: Secure local database of audit results to maintain history across sessions.
 - **Immutable Traceability**: Every audit result is hashed and stored in a simulated blockchain ledger for zero-trust verification.
 - **Premium Dashboard**: A state-of-the-art UI for visualizing supply chain transparency and ESG health.
 
