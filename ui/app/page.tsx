@@ -196,37 +196,58 @@ export default function Home() {
                   {audits.map((audit) => (
                     <motion.div 
                       key={audit.audit_id}
-                      initial={{ scale: 0.95, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className="glass-card p-8 border-l-4 border-l-emerald-500"
+                      initial={{ scale: 0.9, opacity: 0, y: 30 }}
+                      animate={{ scale: 1, opacity: 1, y: 0 }}
+                      className="glass-card p-8 border-l-4 border-l-emerald-500 overflow-hidden relative group"
                     >
-                      <div className="flex justify-between items-start mb-6">
+                      {/* Hover Glow */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                      
+                      <div className="flex justify-between items-start mb-6 relative z-10">
                         <div>
                           <div className="flex items-center gap-3 mb-1">
                             <h4 className="text-2xl font-bold">{audit.company_name}</h4>
-                            <span className="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-mono uppercase">VERIFIED</span>
+                            <span className="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-mono uppercase tracking-widest border border-emerald-500/20">VERIFIED</span>
                           </div>
-                          <p className="text-zinc-400 text-sm">{audit.audit_summary}</p>
+                          <p className="text-zinc-400 text-sm italic">"{audit.audit_summary}"</p>
                         </div>
                         <div className="text-right">
-                          <div className="text-4xl font-black text-emerald-400 leading-none">{Math.round(audit.truth_score)}</div>
-                          <div className="text-[10px] text-zinc-500 font-mono mt-1">TRUTH SCORE</div>
+                          <motion.div 
+                            initial={{ scale: 0.5, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="text-5xl font-black text-emerald-400 leading-none drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                          >
+                            {Math.round(audit.truth_score)}
+                          </motion.div>
+                          <div className="text-[9px] text-zinc-500 font-mono mt-2 tracking-[0.2em] uppercase">Trust Index</div>
                         </div>
                       </div>
 
-                      <div className="grid md:grid-cols-2 gap-4">
-                        {audit.evidence_found.map((e, idx) => (
-                          <div key={idx} className="bg-zinc-900/50 p-4 rounded-xl border border-zinc-800 flex items-start gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center flex-shrink-0">
-                              <FileText size={16} className="text-zinc-400" />
-                            </div>
-                            <div>
-                              <div className="text-xs font-bold text-zinc-300">{e.source}</div>
-                              <div className="text-[10px] text-zinc-500 mb-1">{e.type}</div>
-                              <div className="text-[11px] text-emerald-400 font-mono truncate">{e.value}</div>
-                            </div>
-                          </div>
-                        ))}
+                      <div className="space-y-4">
+                        <div className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">Verification Evidence (RAG Verified)</div>
+                        <div className="grid md:grid-cols-2 gap-3">
+                          {audit.evidence_found.map((e, idx) => (
+                            <motion.div 
+                              key={idx}
+                              whileHover={{ scale: 1.02 }}
+                              className="bg-zinc-900/30 p-4 rounded-xl border border-zinc-800/50 hover:border-emerald-500/30 transition-colors flex items-start gap-4"
+                            >
+                              <div className="w-10 h-10 rounded-lg bg-emerald-500/5 flex items-center justify-center flex-shrink-0 border border-emerald-500/10">
+                                <FileText size={16} className="text-emerald-500/60" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex justify-between items-center mb-1">
+                                  <div className="text-xs font-bold text-zinc-300 truncate">{e.source}</div>
+                                  <div className="text-[9px] text-emerald-400 font-mono">{(e.confidence * 100).toFixed(0)}% CONF</div>
+                                </div>
+                                <div className="text-[11px] text-zinc-500 font-mono truncate mb-2">{e.type}</div>
+                                <div className="text-[12px] text-zinc-100 bg-zinc-950/50 px-2 py-1 rounded border border-zinc-800 font-mono truncate">
+                                  {e.value}
+                                </div>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
                       </div>
                     </motion.div>
                   ))}
@@ -237,29 +258,65 @@ export default function Home() {
 
           {activeTab === 'network' && (
             <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="glass-card h-[600px] flex items-center justify-center relative overflow-hidden"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.02 }}
+              className="glass-card h-[650px] relative overflow-hidden group p-12"
             >
-               <div className="text-center z-10">
-                  <Globe size={64} className="mx-auto mb-6 text-sky-400 animate-pulse" />
-                  <h3 className="text-2xl font-bold mb-2">Supply Chain Network View</h3>
-                  <p className="text-zinc-500 max-w-md">Interactive relationship graph visualizing ESG health across tier-1 and tier-2 suppliers.</p>
-                  <div className="mt-8 flex gap-4 justify-center">
-                    <div className="flex items-center gap-2 text-xs">
-                       <div className="w-3 h-3 bg-emerald-500 rounded-full" /> Healthy
+               <div className="relative z-20 flex flex-col h-full">
+                  <div className="flex justify-between items-start mb-8">
+                    <div>
+                      <h3 className="text-2xl font-bold mb-2">Supply Chain Topography</h3>
+                      <p className="text-zinc-500 text-sm max-w-sm">Global relationship map with real-time ESG leakage detection.</p>
                     </div>
-                    <div className="flex items-center gap-2 text-xs">
-                       <div className="w-3 h-3 bg-yellow-500 rounded-full" /> At Risk
-                    </div>
-                    <div className="flex items-center gap-2 text-xs">
-                       <div className="w-3 h-3 bg-red-500 rounded-full" /> High Leakage
+                    <div className="flex gap-4">
+                      <div className="px-4 py-2 bg-emerald-500/5 border border-emerald-500/20 rounded-lg text-[10px] font-bold text-emerald-400">NODE STATUS: OPTIMAL</div>
                     </div>
                   </div>
+
+                  <div className="flex-1 flex items-center justify-center relative">
+                    {/* SVG Graph Visualization */}
+                    <svg width="800" height="400" viewBox="0 0 800 400" className="opacity-80 group-hover:opacity-100 transition-opacity">
+                      <defs>
+                        <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#10b981" stopOpacity="0.2" />
+                          <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0.2" />
+                        </linearGradient>
+                      </defs>
+                      
+                      {/* Connections */}
+                      <motion.path initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 2 }} d="M 400 200 L 200 100" stroke="url(#lineGrad)" strokeWidth="2" fill="none" />
+                      <motion.path initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 2, delay: 0.2 }} d="M 400 200 L 600 100" stroke="url(#lineGrad)" strokeWidth="2" fill="none" />
+                      <motion.path initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 2, delay: 0.4 }} d="M 400 200 L 400 350" stroke="url(#lineGrad)" strokeWidth="2" fill="none" />
+
+                      {/* Nodes */}
+                      <g className="cursor-pointer group/node">
+                        <circle cx="400" cy="200" r="12" fill="#10b981" className="animate-pulse" />
+                        <text x="420" y="205" fill="white" className="text-[14px] font-bold">Veridion Global</text>
+                        <text x="420" y="220" fill="#10b981" className="text-[10px] font-mono">TRUTH SCORE: 92</text>
+                      </g>
+                      
+                      <g className="cursor-pointer group/node">
+                        <circle cx="200" cy="100" r="8" fill="#10b981" />
+                        <text x="140" y="80" fill="white" className="text-[12px]">EcoLogic Corp</text>
+                      </g>
+
+                      <g className="cursor-pointer group/node">
+                        <circle cx="600" cy="100" r="8" fill="#10b981" />
+                        <text x="615" y="105" fill="white" className="text-[12px]">BioGrid Energy</text>
+                      </g>
+
+                      <g className="cursor-pointer group/node">
+                        <circle cx="400" cy="350" r="8" fill="#f59e0b" />
+                        <text x="415" y="355" fill="white" className="text-[12px]">Titan Logistics</text>
+                        <text x="415" y="370" fill="#f59e0b" className="text-[9px]">WARNING: LEAKAGE</text>
+                      </g>
+                    </svg>
+                  </div>
                </div>
-               {/* Background Grid Lines */}
-               <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+
+               {/* Background Grid */}
+               <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
             </motion.div>
           )}
         </AnimatePresence>
