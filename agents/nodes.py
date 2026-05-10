@@ -2,7 +2,7 @@ import random
 import json
 import os
 from typing import Dict, Any
-from .state import AgentState
+from agents.state import AgentState
 
 # Resolve base path
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
